@@ -22,25 +22,21 @@ export let props = {
             initCircles(fWidth, fWidth);
         }
     },
-    radius: {
+    circlesRadius: {
         value: 50,
         params: {
             min: 10,
             max: 200
         }
     },
-	amplitude: {
-        value: 50,
+	numberOfLines: {
+        value: 2,
         params: {
-            min: 10,
-            max: 300
-        }
-    },
-	frequency: {
-        value: 250,
-        params: {
-            min: 100,
-            max: 1500
+            min: 0,
+            max: 10
+        },
+        onChange: () => {
+            initLines(fWidth, fWidth);
         }
     },
     saveSvg: {
@@ -57,6 +53,9 @@ export let props = {
 			
 			circles = [];
             initCircles(fWidth, fWidth);
+
+			lines = [];
+            initLines(fWidth, fWidth);
         },
         params: {
             label: 'Regenerate Hash'
@@ -66,8 +65,9 @@ export let props = {
 
 let containerCSSSelector;
 let circles = [];
-let fWidth, fHeight;
+let lines = [];
 
+let fWidth, fHeight;
 export let init = ({ context, width, height, hash = randomSeed.getRandomSeed()}) => {
     initSeed(hash);
     setSizes(width, height);
@@ -76,30 +76,12 @@ export let init = ({ context, width, height, hash = randomSeed.getRandomSeed()})
     initSVG(width, height);
 
     initCircles();
+	initLines();
 };
 
 export let setSizes = (width, height) => {
     fWidth = width;
     fHeight = height;
-}
-
-export let initCircles = () => {
-    let circlesCountOffset = props.numberOfCircles.value - circles.length;
-
-    if(circlesCountOffset > 0) {
-        for (let index = 0; index < circlesCountOffset; index++) {
-            createCircle(circlesCountOffset);
-        }
-    } else {
-        circles.length = props.numberOfCircles.value;
-    }
-}
-
-export let createCircle = () => {
-    circles.push({
-        x: random(0, fWidth),
-        y: random(0, (fHeight/2) - 100)
-    });
 }
 
 export let initSeed = (seed) => {
@@ -136,10 +118,66 @@ export let renderSVG = () => {
     svgEl.style.flex = 'none';
 }
 
+
+// 
+// DRAWING PART
+// 
+
+// Create circles
+export let initCircles = () => {
+    let circlesCountOffset = props.numberOfCircles.value - circles.length;
+
+    if(circlesCountOffset > 0) {
+        for (let index = 0; index < circlesCountOffset; index++) {
+            createCircle(circlesCountOffset);
+        }
+    } else {
+        circles.length = props.numberOfCircles.value;
+    }
+}
+
+export let createCircle = () => {
+    circles.push({
+        x: random(0, fWidth),
+        y: random(0, fHeight)
+    });
+}
+
+// Create lines
+export let initLines = () => {
+    let linesCountOffset = props.numberOfLines.value - lines.length;
+
+    if(linesCountOffset > 0) {
+        for (let index = 0; index < linesCountOffset; index++) {
+            initLine(linesCountOffset);
+        }
+    } else {
+        lines.length = props.numberOfLines.value;
+    }
+}
+
+export let initLine = () => {
+	let line = [];
+
+	// Get a random number of points, and add all points as array
+	let points = Array.from(new Array(roundRandom(2, 4))).map((point) => {
+		point = {
+			x: random(0, fWidth),
+			y: random(0, fHeight)
+		}
+		line.push(point);
+
+	});
+
+	lines.push(line);
+
+}
+
+
 // Draw function
 export let update = ({ context, width, height }) => {
     
-    const radius = props.radius.value;
+    const radius = props.circlesRadius.value;
     svg5.clear();
     svg5.stroke('black');
     svg5.noFill();
@@ -147,25 +185,31 @@ export let update = ({ context, width, height }) => {
 	// Pencil thickness
     svg5.strokeWidth(5);
 
-	// Draw Circles
+	// Loop and draw Circles
     circles.forEach((circle) => {
         svg5.circle(circle.x, circle.y, radius)
     });
 
-	// Draw Lines with a cool noise
-	for(let y = fHeight/2; y <= fHeight; y += 10){
-        svg5.beginShape()
-        svg5.vertex(0, fHeight)
-        for(let x = 0; x <= fWidth; x += 10){
-            svg5.vertex(x, y + svg5.noise(x/props.frequency.value, y/props.frequency.value) * props.amplitude.value)
-        }
-        svg5.vertex(fWidth, fHeight)
-        svg5.endShape(svg5.CLOSE)
-    }
+	// Loop and draw Circles
+    circles.forEach((circle) => {
+        svg5.circle(circle.x, circle.y, radius)
+    });
+
+	// Loop and draw Lines
+    lines.forEach((line) => {
+        svg5.beginShape();
+		console.log(line);
+
+		line.forEach(point => {
+
+			svg5.vertex(point.x, point.y);
+		});
+
+		svg5.endShape();
+    });
 
 	// Important to render the SVG
     renderSVG();
-
 };
 
 export let resize = ({ width, height }) => {

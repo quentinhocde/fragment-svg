@@ -1,0 +1,6 @@
+{
+  "dependencies": {
+    "simplex-noise": "^4.0.1",
+    "svg5": "^0.2.2"
+  }
+}

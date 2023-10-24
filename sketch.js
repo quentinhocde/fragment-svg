@@ -12,6 +12,16 @@ export let fps = 0;
 
 // Interface and variables
 export let props = {
+	pencilThickness: {
+        value: 5,
+        params: {
+            min: 1,
+            max: 10
+        },
+        onChange: () => {
+            initCircles(fWidth, fWidth);
+        }
+    },
     numberOfCircles: {
         value: 10,
         params: {
@@ -146,7 +156,6 @@ export let createCircle = () => {
 // Create line
 export let initLine = () => {
     let pointsCountOffset = props.numberOfPoints.value - line.length;
-	console.log(pointsCountOffset, props.numberOfPoints.value, line.length);
 
     if(pointsCountOffset > 0) {
         for (let index = 0; index < pointsCountOffset; index++) {
@@ -177,7 +186,7 @@ export let update = ({ context, width, height }) => {
     svg5.noFill();
 
 	// Pencil thickness
-    svg5.strokeWidth(5);
+    svg5.strokeWidth(props.pencilThickness.value);
 
 	// Loop and draw Circles
     circles.forEach((circle) => {

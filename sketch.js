@@ -29,14 +29,14 @@ export let props = {
             max: 200
         }
     },
-	numberOfLines: {
+	numberOfPoints: {
         value: 2,
         params: {
             min: 0,
-            max: 10
+            max: 100
         },
         onChange: () => {
-            initLines(fWidth, fWidth);
+            initLine(fWidth, fWidth);
         }
     },
     saveSvg: {
@@ -54,8 +54,8 @@ export let props = {
 			circles = [];
             initCircles(fWidth, fWidth);
 
-			lines = [];
-            initLines(fWidth, fWidth);
+			line = [];
+            initLine(fWidth, fWidth);
         },
         params: {
             label: 'Regenerate Hash'
@@ -65,7 +65,7 @@ export let props = {
 
 let containerCSSSelector;
 let circles = [];
-let lines = [];
+let line = [];
 
 let fWidth, fHeight;
 export let init = ({ context, width, height, hash = randomSeed.getRandomSeed()}) => {
@@ -76,7 +76,7 @@ export let init = ({ context, width, height, hash = randomSeed.getRandomSeed()})
     initSVG(width, height);
 
     initCircles();
-	initLines();
+	initLine();
 };
 
 export let setSizes = (width, height) => {
@@ -143,33 +143,27 @@ export let createCircle = () => {
     });
 }
 
-// Create lines
-export let initLines = () => {
-    let linesCountOffset = props.numberOfLines.value - lines.length;
+// Create line
+export let initLine = () => {
+    let pointsCountOffset = props.numberOfPoints.value - line.length;
+	console.log(pointsCountOffset, props.numberOfPoints.value, line.length);
 
-    if(linesCountOffset > 0) {
-        for (let index = 0; index < linesCountOffset; index++) {
-            initLine(linesCountOffset);
+    if(pointsCountOffset > 0) {
+        for (let index = 0; index < pointsCountOffset; index++) {
+            addPoint(pointsCountOffset);
         }
     } else {
-        lines.length = props.numberOfLines.value;
+        line.length = props.numberOfPoints.value;
     }
 }
 
-export let initLine = () => {
-	let line = [];
-
+export let addPoint = () => {
 	// Get a random number of points, and add all points as array
-	let points = Array.from(new Array(roundRandom(2, 4))).map((point) => {
-		point = {
-			x: random(0, fWidth),
-			y: random(0, fHeight)
-		}
-		line.push(point);
-
-	});
-
-	lines.push(line);
+	const point = {
+		x: random(0, fWidth),
+		y: random(0, fHeight)
+	}
+	line.push(point);
 
 }
 
@@ -195,18 +189,15 @@ export let update = ({ context, width, height }) => {
         svg5.circle(circle.x, circle.y, radius)
     });
 
-	// Loop and draw Lines
-    lines.forEach((line) => {
-        svg5.beginShape();
-		console.log(line);
+	// Loop points and draw line
+	svg5.beginShape();
 
-		line.forEach(point => {
+	line.forEach(point => {
+		svg5.circle(point.x, point.y, 30)
+		svg5.vertex(point.x, point.y);
+	});
 
-			svg5.vertex(point.x, point.y);
-		});
-
-		svg5.endShape();
-    });
+	svg5.endShape();
 
 	// Important to render the SVG
     renderSVG();

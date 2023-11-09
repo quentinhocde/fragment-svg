@@ -1,5 +1,8 @@
 import * as svg5 from 'svg5';
 import { random, roundRandom, randomSeed } from './utils.js';
+import { TextToSVG } from './vendors/text-to-svg.js';
+import arialFont from './fonts/arial.ttf';
+const textToSVG = TextToSVG.loadSync(arialFont);
 
 // Global options
 export let filenamePattern = ({ filename, suffix, year, month, day, hours, minutes, seconds }) => {
@@ -49,9 +52,42 @@ export let props = {
             initLine(fWidth, fWidth);
         }
     },
+	text: {
+		value: 'Hello World!'
+	},
+	textPositionX: {
+		value: 50, 
+		params: {
+			min: 0,
+			max: 100
+		}
+	},
+	textPositionY: {
+		value: 50, 
+		params: {
+			min: 0,
+			max: 100
+		}
+	},
+	textSize: {
+		value: 100, 
+		params: {
+			min: 50,
+			max: 500
+		}
+	},
     saveSvg: {
         value: () => {
-            svg5.save();
+            let svgData = document.querySelector('svg').outerHTML;
+            let svgBlob = new Blob([svgData], {type:"image/svg+xml;charset=utf-8"});
+            let svgUrl = URL.createObjectURL(svgBlob);
+            let downloadLink = document.createElement("a");
+            downloadLink.href = svgUrl;
+            downloadLink.download = "export-" + (new Date().toISOString()) + ".svg";
+            document.body.appendChild(downloadLink);
+            downloadLink.click();
+            document.body.removeChild(downloadLink);
+
         },
         params: {
             label: 'Save SVG'
@@ -126,6 +162,9 @@ export let renderSVG = () => {
     svgEl.style.setProperty('width', 'auto', 'important');
     svgEl.style.setProperty('height','auto', 'important');
     svgEl.style.flex = 'none';
+
+	
+	createText();
 }
 
 
@@ -176,6 +215,17 @@ export let addPoint = () => {
 
 }
 
+export let createText = () => {	
+	let x = fWidth * props.textPositionX.value / 100;
+	let y = fHeight * props.textPositionY.value / 100;
+
+	const attributes = {fill: 'transparent', stroke: 'black', 'stroke-width': props.pencilThickness.value};
+	const options = {x: x, y: y, fontSize: props.textSize.value, anchor: 'top', attributes: attributes};
+
+	const path = textToSVG.getPath(props.text.value,options);
+	svg5._svg.insertAdjacentHTML('beforeend',path);
+
+}
 
 // Draw function
 export let update = ({ context, width, height }) => {

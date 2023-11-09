@@ -1,6 +1,10 @@
 {
   "dependencies": {
+    "opentype.js": "^1.3.4",
     "simplex-noise": "^4.0.1",
     "svg5": "^0.2.2"
+  },
+  "devDependencies": {
+    "@types/node": "^20.8.9"
   }
 }

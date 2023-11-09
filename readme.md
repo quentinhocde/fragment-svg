@@ -1,6 +1,8 @@
 # Installation
 `npm i fragment-tools -g`
 
+`npm i`
+
 # Launch fragment
 `fragment sketch.js`
 

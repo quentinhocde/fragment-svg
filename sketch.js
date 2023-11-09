@@ -52,30 +52,6 @@ export let props = {
             initLine(fWidth, fWidth);
         }
     },
-	text: {
-		value: 'Hello World!'
-	},
-	textPositionX: {
-		value: 50, 
-		params: {
-			min: 0,
-			max: 100
-		}
-	},
-	textPositionY: {
-		value: 50, 
-		params: {
-			min: 0,
-			max: 100
-		}
-	},
-	textSize: {
-		value: 100, 
-		params: {
-			min: 50,
-			max: 500
-		}
-	},
     saveSvg: {
         value: () => {
             let svgData = document.querySelector('svg').outerHTML;
@@ -164,7 +140,6 @@ export let renderSVG = () => {
     svgEl.style.flex = 'none';
 
 	
-	createText();
 }
 
 
@@ -215,17 +190,6 @@ export let addPoint = () => {
 
 }
 
-export let createText = () => {	
-	let x = fWidth * props.textPositionX.value / 100;
-	let y = fHeight * props.textPositionY.value / 100;
-
-	const attributes = {fill: 'transparent', stroke: 'black', 'stroke-width': props.pencilThickness.value};
-	const options = {x: x, y: y, fontSize: props.textSize.value, anchor: 'top', attributes: attributes};
-
-	const path = textToSVG.getPath(props.text.value,options);
-	svg5._svg.insertAdjacentHTML('beforeend',path);
-
-}
 
 // Draw function
 export let update = ({ context, width, height }) => {
